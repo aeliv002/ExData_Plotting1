@@ -1,15 +1,15 @@
 # File location where file will be saved
-fileNamePlot1 <- "plot1.png"
+fileNamePlot <- "plot1.png"
 
-# Sets D/M/Y format when importing
+# Set D/M/Y format when importing
 setClass("dateDMY")
 setAs("character","dateDMY", function(from) {as.Date(from, format="%d/%m/%Y")} )
 
-# Read only needed columns date and Global_active_power
+# Read only needed columns (date and Global_active_power)
 household.Power.Consumption.DF <- read.table(
                                       file="household_power_consumption.txt",
                                       header=TRUE,
-                                      # This will only reads two colums
+                                      # This will only select two colums
                                       colClasses = c("dateDMY","NULL","numeric",rep("NULL",6)),
                                       na.strings = "?",
                                       sep=";")
@@ -24,9 +24,9 @@ household.Power.Consumption.Subset.DF <- subset(
                                             x= household.Power.Consumption.DF,
                                             subset= Date %in% neededDates)
 
-# Code for saving to file plot1.png
+# Code for saving to png file
 png(
-    filename=fileNamePlot1,
+    filename=fileNamePlot,
     width = 480, 
     height = 480)
 
@@ -36,5 +36,4 @@ hist(
   main="Global Active Power", 
   xlab="Global Active Power (kilowatts)")
 
-# Finalize the saving
 dev.off()

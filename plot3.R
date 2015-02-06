@@ -1,24 +1,24 @@
-# This is locale for time in windows
+# This is locale for in windows
 if (Sys.getenv("OS") == "Windows_NT"){
   Sys.setlocale("LC_ALL", "English")
 } else{
-# If it is Linux. If Mac You have to add Locale Yourself.
+  # If it is Linux. If Mac You have to add Locale Yourself.
   Sys.setlocale("LC_ALL", 'en_US.UTF-8')
 }
 
 # File location where file will be saved
-fileNamePlot <- "plot2.png"
+fileNamePlot <- "plot3.png"
 
 # Sets D/M/Y format when importing
 setClass("dateDMY")
 setAs("character","dateDMY", function(from) {as.Date(from, format="%d/%m/%Y")} )
 
-# Read only needed columns.
+# Read only needed columns
 household.Power.Consumption.DF <- read.table(
   file="household_power_consumption.txt",
   header=TRUE,
   # This will select needed columns
-  colClasses = c("dateDMY","character","numeric",rep("NULL",6)),
+  colClasses = c("dateDMY","character",rep("NULL",4),rep("numeric",3)),
   na.strings = "?",
   sep=";")
 
@@ -31,7 +31,7 @@ neededDates <- c(
 household.Power.Consumption.Subset.DF <- subset(
   x= household.Power.Consumption.DF,
   subset= Date %in% neededDates
-  )
+)
 
 # concat date and time and create POSIXlt for new variable dateTime
 household.Power.Consumption.Subset.DF <- 
@@ -46,7 +46,9 @@ household.Power.Consumption.Subset.DF <-
           "%Y-%m-%d %H:%M:%S"
         )
       ),
-      globalActivePower = household.Power.Consumption.Subset.DF$Global_active_power
+      subMetering1 = household.Power.Consumption.Subset.DF$Sub_metering_1,
+      subMetering2 = household.Power.Consumption.Subset.DF$Sub_metering_2,
+      subMetering3 = household.Power.Consumption.Subset.DF$Sub_metering_3
     )
   )
 
@@ -57,10 +59,31 @@ png(
   width = 480, 
   height = 480)
 
+lineColors <- c("black","red","blue")
+legendNames <- c("Sub_metering_1","Sub_metering_2","Sub_metering_3")
+
 plot(
-  household.Power.Consumption.Subset.DF,
+  x=household.Power.Consumption.Subset.DF$dateTime,
+  y=household.Power.Consumption.Subset.DF$subMetering1,
   type="l",
-  ylab="Global Active Power (kilowatts)",
-  xlab="")
+  ylab="Energy sub metering",
+  xlab="",
+  col=lineColors[1])
+
+lines(
+  x=household.Power.Consumption.Subset.DF$dateTime,
+  y=household.Power.Consumption.Subset.DF$subMetering2, type="l",
+  col=lineColors[2])
+
+lines(
+  x=household.Power.Consumption.Subset.DF$dateTime,
+  y=household.Power.Consumption.Subset.DF$subMetering3, type="l",
+  col=lineColors[3])
+
+legend(
+  "topright", 
+  legendNames, 
+  col=lineColors, 
+  lty=1);
 
 dev.off()
